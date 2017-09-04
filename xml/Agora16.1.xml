@@ -110,7 +110,7 @@
                 <p>commentary</p>
             </div>
             <div type="bibliography">
-                <bibl><ptr target="bibliography.xml#b0001"/>, p. 3.</bibl> <!-- doesn't work, fix xslt -->
+                <bibl><ptr target="bibliography.xml#b0001"/>, p. 3.</bibl>
             </div>
         </body>
     </text>
