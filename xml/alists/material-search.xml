@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="xml"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Controlled vocabulary for material</title>
+            </titleStmt>
+            <publicationStmt><p></p></publicationStmt> 
+            <sourceDesc><p></p></sourceDesc>
+        </fileDesc>
+    </teiHeader>
+    <text>
+        <body>
+            <list>
+                <item xml:id="m1">
+                    <term xml:lang="ru">мрамор</term>
+                    <gloss xml:lang="en">marble</gloss>
+                </item>
+                <item xml:id="m2">
+                    <term xml:lang="ru">известняк</term>
+                    <gloss xml:lang="en">limestone</gloss>
+                </item>
+                <item xml:id="m3">
+                    <term xml:lang="ru">каменные тессеры</term>
+                    <gloss xml:lang="en">stone tesserae</gloss>
+                </item>
+                <item xml:id="m4">
+                    <term xml:lang="ru">песчаник</term>
+                    <gloss xml:lang="en">sandstone</gloss>
+                </item>
+                <item xml:id="m5">
+                    <term xml:lang="ru">охра</term>
+                    <gloss xml:lang="en">ochre</gloss>
+                </item>
+                <item xml:id="m6">
+                    <term xml:lang="ru">штукатурка</term>
+                    <gloss xml:lang="en">plaster</gloss>
+                </item>
+                <item xml:id="m7">
+                    <term xml:lang="ru">темпера</term>
+                    <gloss xml:lang="en">tempera</gloss>
+                </item>
+                <item xml:id="m8">
+                    <term xml:lang="ru">мергель</term>
+                    <gloss xml:lang="en">marl</gloss>
+                </item>
+                <item xml:id="m9">
+                    <term xml:lang="ru">ракушечник</term>
+                    <gloss xml:lang="en">shell-rock</gloss>
+                </item>
+                <item xml:id="m10">
+                    <term xml:lang="ru">глина</term>
+                    <gloss xml:lang="en">clay</gloss>
+                </item>
+                <item xml:id="m11">
+                    <term xml:lang="ru">диорит</term>
+                    <gloss xml:lang="en">diorite</gloss>
+                </item>
+                <item xml:id="m12">
+                    <term xml:lang="ru">гранит</term>
+                    <gloss xml:lang="en">granite</gloss>
+                </item>
+                <item xml:id="m13">
+                    <term xml:lang="ru">мраморовидный известняк</term>
+                    <gloss xml:lang="en">marble-like limestone</gloss>
+                </item>
+                <item xml:id="m14">
+                    <term xml:lang="ru">неизвестен</term>
+                    <gloss xml:lang="en">unknown</gloss>
+                </item>
+                <item xml:id="m15">
+                    <term xml:lang="ru">красноватый известняк («балаклавский мрамор»)</term>
+                    <gloss xml:lang="en">reddish limestone ("Balaklava marble")</gloss>
+                </item>
+            </list>
+        </body>
+    </text>
+</TEI>
