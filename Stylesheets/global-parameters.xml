@@ -118,7 +118,7 @@
   
   <parameter>
     <name>css-loc</name>
-    <value>../Stylesheets/global.css</value>
+    <value>../xsl/global.css</value>
   </parameter>
   
 <parameter>

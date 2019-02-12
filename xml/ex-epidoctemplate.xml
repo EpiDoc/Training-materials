@@ -21,7 +21,7 @@
                         <objectDesc>
                             <supportDesc>
                                 <support>description of object/monument (likely to include <material/>
-                                    and <objectType/> information, <dimensions/>, etc.)</support>
+                                    and <objectType/> information, <dimensions><width>3</width><height>4</height><depth>1</depth></dimensions>, etc.)</support>
                             </supportDesc>
                             <layoutDesc>
                                 <layout>description of text field/campus</layout>
@@ -53,7 +53,43 @@
         <body>
             <div type="edition" xml:space="preserve">
                 <ab>
-                    <lb n="1"/>Greek or Latin (etc.) text here
+                    <lb n="1"/><supplied reason="lost"><expan><abbr>Imp</abbr><ex>eratori</ex></expan> 
+                        <expan><abbr>Caes</abbr><ex>ari</ex></expan> diui Hadriani filio</supplied>
+                    <lb n="2"/><supplied reason="lost">diui</supplied> 
+                    <supplied reason="lost">Traiani</supplied> 
+                    <supplied reason="lost">P</supplied>arthic<gap reason="illegible" quantity="2" unit="character"/><supplied 
+                        reason="lost">i</supplied> 
+                    <supplied reason="lost"><expan><abbr>nep</abbr><ex>oti</ex></expan></supplied>
+                    <lb n="3"/><supplied reason="lost"><expan><abbr>T</abbr><ex>ito</ex></expan></supplied> 
+                    <supplied reason="lost">Ae</supplied>lio
+                    <lb n="4"/><supplied reason="lost">Hadriano</supplied> Anton<supplied reason="lost">ino</supplied>
+                    <lb n="5"/><supplied reason="lost"><expan><abbr>Aug</abbr><ex>usto</ex></expan> 
+                        Pio <expan><abbr>trib</abbr><ex>unicia</ex></expan> 
+                        <expan><abbr>pot</abbr><ex>estate</ex></expan></supplied><gap reason="lost" extent="unknown" unit="character"/>II 
+                    <expan><abbr>imp</abbr><ex>eratori</ex></expan> <num value="4">
+                    <gap reason="lost" quantity="1"
+                     unit="character"/>III
+                   <certainty match="../@value" locus="value"
+                     assertedValue="8"/>
+                    <certainty match="../@value" locus="value"
+                     assertedValue="13"/>
+                    <certainty match="../@value" locus="value"
+                     assertedValue="53"/>
+                    <certainty match="../@value" locus="value"
+                     assertedValue="103"/>
+                   </num> 
+                    
+                    <w part="I"><expan><abbr>praef</abbr><ex>ect</ex></expan></w>
+                    
+                    <expan><abbr>c<supplied 
+                    reason="lost">o</supplied></abbr><ex>n</ex><abbr><supplied 
+                        reason="lost">s</supplied></abbr><ex>uli</ex></expan> 
+                    
+                    - - - p(atri) p(atriae)]
+                    <lb n="6" break="no"/>[Sabrathense]s publi[ce] 
+                    <lb n="7"/><expan><abbr>Ca<supplied 
+                        reason="lost">es</supplied></abbr><supplied 
+                            reason="lost"><ex>ari</ex></supplied></expan>
                 </ab>
             </div>
             <div type="apparatus">

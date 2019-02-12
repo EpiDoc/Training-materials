@@ -3,18 +3,18 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:t="http://www.tei-c.org/ns/1.0" exclude-result-prefixes="t" 
                 version="2.0">
-  <!-- Contains named templates for InsLib file structure (aka "metadata" aka "supporting data") -->  
+  <!-- Contains named templates for seals file structure (aka "metadata" aka "supporting data") -->  
    
    <!-- Called from htm-tpl-structure.xsl -->
 
-   <xsl:template name="inslib-body-structure">
-     <p><b>Description: </b>
+   <xsl:template name="seals-body-structure">
+     <p><b>Beschreibung: </b>
      <xsl:choose>
        <xsl:when test="//t:support/t:p/text()">
-         <xsl:apply-templates select="//t:support/t:p" mode="inslib-dimensions"/>
+         <xsl:apply-templates select="//t:support/t:p" mode="seals-dimensions"/>
        </xsl:when>
        <xsl:when test="//t:support//text()">
-         <xsl:apply-templates select="//t:support" mode="inslib-dimensions"/>
+         <xsl:apply-templates select="//t:support" mode="seals-dimensions"/>
        </xsl:when>
        <xsl:otherwise>Unknown</xsl:otherwise>
      </xsl:choose>
@@ -56,7 +56,7 @@
      <p><b>Findspot: </b>
      <xsl:choose>
        <xsl:when test="//t:provenance[@type='found'][string(translate(normalize-space(.),' ',''))]">
-         <xsl:apply-templates select="//t:provenance[@type='found']" mode="inslib-placename"/>
+         <xsl:apply-templates select="//t:provenance[@type='found']" mode="seals-placename"/>
        </xsl:when>
        <xsl:otherwise>Unknown</xsl:otherwise>
      </xsl:choose>
@@ -64,7 +64,7 @@
      <b>Original location: </b>
      <xsl:choose>
        <xsl:when test="//t:origin/t:origPlace/text()">
-         <xsl:apply-templates select="//t:origin/t:origPlace" mode="inslib-placename"/>
+         <xsl:apply-templates select="//t:origin/t:origPlace" mode="seals-placename"/>
        </xsl:when>
        <xsl:otherwise>Unknown</xsl:otherwise>
      </xsl:choose>
@@ -72,60 +72,27 @@
      <b>Last recorded location: </b>
      <xsl:choose>
        <xsl:when test="//t:provenance[@type='observed'][string(translate(normalize-space(.),' ',''))]">
-         <xsl:apply-templates select="//t:provenance[@type='observed']" mode="inslib-placename"/>
+         <xsl:apply-templates select="//t:provenance[@type='observed']" mode="seals-placename"/>
          <!-- Named template found below. -->
-         <xsl:call-template name="inslib-invno"/> 
+         <xsl:call-template name="seals-invno"/> 
        </xsl:when>
        <xsl:when test="//t:msIdentifier//t:repository[string(translate(normalize-space(.),' ',''))]">
          <xsl:value-of select="//t:msIdentifier//t:repository[1]"/>
          <!-- Named template found below. -->
-         <xsl:call-template name="inslib-invno"/>
+         <xsl:call-template name="seals-invno"/>
        </xsl:when>
        <xsl:otherwise>Unknown</xsl:otherwise>
      </xsl:choose>
      </p>
 
-     <div id="inslib-text">
-          <div id="edition">
-              <p><b>Interpretive edition:</b></p>
-              <!-- Edited text output -->
-              <xsl:variable name="edtxt">
-                  <xsl:apply-templates select="//t:div[@type='edition']">
-                      <xsl:with-param name="parm-edition-type" tunnel="yes" select="'interpretive'"/>
-                      <xsl:with-param name="parm-verse-lines" tunnel="yes" select="'no'"/>
-                   </xsl:apply-templates>
-                </xsl:variable>
-              <!-- Moded templates found in htm-tpl-sqbrackets.xsl -->
-              <xsl:apply-templates select="$edtxt" mode="sqbrackets"/>
-            </div>
-          
-          <xsl:if test="//t:div[@type='edition']//t:lg">
-              <div id="verse">
-                  <p><b>Verse edition:</b></p>
-                  <!-- Edited text output -->
-                  <xsl:variable name="edtxt">
-                      <xsl:apply-templates select="//t:div[@type='edition']">
-                          <xsl:with-param name="parm-edition-type" tunnel="yes" select="'interpretive'"/>
-                          <xsl:with-param name="parm-verse-lines" tunnel="yes" select="'yes'"/>
-                      </xsl:apply-templates>
-                  </xsl:variable>
-                  <!-- Moded templates found in htm-tpl-sqbrackets.xsl -->
-                  <xsl:apply-templates select="$edtxt" mode="sqbrackets"/>
-               </div>
-         </xsl:if>
-              
-        <div id="diplomatic">
-            <p><b>Diplomatic edition:</b></p>
-            <!-- Edited text output -->
-            <xsl:variable name="edtxt">
-               <xsl:apply-templates select="//t:div[@type='edition']">
-                  <xsl:with-param name="parm-edition-type" tunnel="yes" select="'diplomatic'"/>
-                 <xsl:with-param name="parm-verse-lines" tunnel="yes" select="'no'"/>
-              </xsl:apply-templates>
-           </xsl:variable>
-           <!-- Moded templates found in htm-tpl-sqbrackets.xsl -->
-           <xsl:apply-templates select="$edtxt" mode="sqbrackets"/>
-        </div>
+     <div id="edition">
+       <p><b>Edition:</b></p>
+       <!-- Edited text output -->
+       <xsl:variable name="edtxt">
+         <xsl:apply-templates select="//t:div[@type='edition']"/>
+       </xsl:variable>
+       <!-- Moded templates found in htm-tpl-sqbrackets.xsl -->
+       <xsl:apply-templates select="$edtxt" mode="sqbrackets"/>
      </div>
 
      <div id="apparatus">
@@ -165,9 +132,9 @@
      </p>
    </xsl:template>
 
-   <xsl:template name="inslib-structure">
+   <xsl:template name="seals-structure">
       <xsl:variable name="title">
-         <xsl:call-template name="inslib-title" />
+         <xsl:call-template name="seals-title" />
       </xsl:variable>
 
       <html>
@@ -183,32 +150,32 @@
             <h1>
                <xsl:value-of select="$title"/>
             </h1>
-            <xsl:call-template name="inslib-body-structure" />
+            <xsl:call-template name="seals-body-structure" />
          </body>
       </html>
    </xsl:template>
 
-   <xsl:template match="t:dimensions" mode="inslib-dimensions">
+   <xsl:template match="t:dimensions" mode="seals-dimensions">
       <xsl:if test="//text()">
          <xsl:if test="t:width/text()">w: 
             <xsl:value-of select="t:width"/>
             <xsl:if test="t:height/text()">
-               <xsl:text> × </xsl:text>
+               <xsl:text> x </xsl:text>
             </xsl:if>
          </xsl:if>
          <xsl:if test="t:height/text()">h: 
             <xsl:value-of select="t:height"/>
          </xsl:if>
-          <xsl:if test="t:depth/text()"><xsl:text> × d:</xsl:text>
+         <xsl:if test="t:depth/text()">x d:
             <xsl:value-of select="t:depth"/>
          </xsl:if>
-          <xsl:if test="t:dim[@type='diameter']/text()"><xsl:text> × diam.:</xsl:text>
+         <xsl:if test="t:dim[@type='diameter']/text()">x diam.:
             <xsl:value-of select="t:dim[@type='diameter']"/>
          </xsl:if>
       </xsl:if>
    </xsl:template>
    
-   <xsl:template match="t:placeName|t:rs" mode="inslib-placename">
+   <xsl:template match="t:placeName|t:rs" mode="seals-placename">
       <xsl:choose>
          <xsl:when test="contains(@ref,'pleiades.stoa.org') or contains(@ref,'geonames.org')">
             <a>
@@ -224,7 +191,7 @@
       </xsl:choose>
    </xsl:template>
    
-   <xsl:template name="inslib-invno">
+   <xsl:template name="seals-invno">
       <xsl:if test="//t:idno[@type='invNo'][string(translate(normalize-space(.),' ',''))]">
          <xsl:text> (Inv. no. </xsl:text>
          <xsl:for-each select="//t:idno[@type='invNo'][string(translate(normalize-space(.),' ',''))]">
@@ -237,7 +204,7 @@
       </xsl:if>
    </xsl:template>
 
-   <xsl:template name="inslib-title">
+   <xsl:template name="seals-title">
      <xsl:choose>
        <xsl:when test="//t:titleStmt/t:title/text() and number(substring(//t:publicationStmt/t:idno[@type='filename']/text(),2,5))">
          <xsl:value-of select="substring(//t:publicationStmt/t:idno[@type='filename'],1,1)"/> 
@@ -256,7 +223,7 @@
          <xsl:value-of select="//t:idno[@type='filename']"/>
        </xsl:when>
        <xsl:otherwise>
-         <xsl:text>EpiDoc example output, InsLib style</xsl:text>
+         <xsl:text>EpiDoc example output, seals style</xsl:text>
        </xsl:otherwise>
      </xsl:choose>
    </xsl:template>
