@@ -105,9 +105,7 @@
             </msDesc>
          </sourceDesc>
       </fileDesc>
-     <xi:include href="encoding-desc.xml">
-     <xi:fallback><!--encodingDesc should have been included here--></xi:fallback>
-     </xi:include>
+     
 
 <revisionDesc>
          <change when="2015-04-08" who="CB">Andrey's corrections</change>
