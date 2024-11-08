@@ -59,10 +59,7 @@
                   </xsl:otherwise>
                </xsl:choose>
             </xsl:for-each>
-
-            <!--<xsl:call-template name="middot">
-               <xsl:with-param name="unc-len" select="$un-len-all"/>
-            </xsl:call-template>-->
+            
          </xsl:when>
          <xsl:otherwise>
             <xsl:choose>
@@ -75,41 +72,10 @@
                   <xsl:for-each select="1 to string-length()">
                      <xsl:value-of select="concat(substring($text,.,1),'&#x0323;')"/>
                   </xsl:for-each>
-                  <!--<xsl:call-template name="subpunct">
-                     <xsl:with-param name="unc-len" select="string-length($text-content)"/>
-                     <xsl:with-param name="abs-len" select="string-length($text-content)+1"/>
-                     <xsl:with-param name="text-content" select="$text-content"/>
-                  </xsl:call-template>-->
                </xsl:otherwise>
             </xsl:choose>
          </xsl:otherwise>
       </xsl:choose>
    </xsl:template>
-
-
-   <!--<xsl:template name="middot">
-      <xsl:param name="unc-len"/>
-      <xsl:if test="not($unc-len = 0)">
-         <xsl:text>·</xsl:text>
-         <xsl:call-template name="middot">
-            <xsl:with-param name="unc-len" select="$unc-len - 1"/>
-         </xsl:call-template>
-      </xsl:if>
-   </xsl:template>-->
-
-   <!--<xsl:template name="subpunct">
-      <xsl:param name="abs-len"/>
-      <xsl:param name="unc-len"/>
-      <xsl:param name="text-content"/>
-      <xsl:if test="$unc-len!=0">
-         <xsl:value-of select="substring($text-content, number($abs-len - $unc-len),1)"/>
-         <xsl:text>&#x0323;</xsl:text>
-         <xsl:call-template name="subpunct">
-            <xsl:with-param name="unc-len" select="$unc-len - 1"/>
-            <xsl:with-param name="abs-len" select="string-length($text-content)+1"/>
-            <xsl:with-param name="text-content" select="$text-content"/>
-         </xsl:call-template>
-      </xsl:if>
-   </xsl:template>-->
 
 </xsl:stylesheet>
