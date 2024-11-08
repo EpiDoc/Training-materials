@@ -5,19 +5,21 @@
                 version="2.0">
   <xsl:include href="teiref.xsl"/>
   
-  <xsl:template match="t:ref">
+   <xsl:template match="t:ref" mode="#default inslib-dimensions inslib-placename sample-dimensions medcyprus-location medcyprus-dimensions">
+      <xsl:param name="parm-edn-structure" tunnel="yes" required="no"/>
+      <xsl:param name="parm-leiden-style" tunnel="yes" required="no"/>
       <xsl:choose>
          <xsl:when test="@type = 'reprint-from'">
             <br/>
             <!-- Found in teiref.xsl -->
-        <xsl:call-template name="reprint-text">
+            <xsl:call-template name="reprint-text">
                <xsl:with-param name="direction" select="'from'"/>
             </xsl:call-template>
          </xsl:when>
          <xsl:when test="@type = 'reprint-in'">
             <br/>
             <!-- Found in teiref.xsl -->
-        <xsl:call-template name="reprint-text">
+            <xsl:call-template name="reprint-text">
                <xsl:with-param name="direction" select="'in'"/>
             </xsl:call-template>
          </xsl:when>
@@ -29,11 +31,25 @@
                <xsl:apply-templates/>
             </a>
          </xsl:when>
+         <!-- template specific rendering of t:ref should be moved here from the various htm-tpl-struct-xxx.xsl files -->
          <xsl:otherwise>
-            <xsl:apply-templates/>
+            <xsl:choose>
+               <xsl:when test="@target">
+                  <a href="{@target}" target="_blank"><xsl:apply-templates/></a>
+               </xsl:when>
+               <xsl:when test="@corresp and not(@target)">
+                  <a href="{@corresp}" target="_blank"><xsl:apply-templates/></a>
+               </xsl:when>
+               <xsl:when test="@type='inscription' and @n and not(@target) and not(@corresp)">
+                  <a href="{@n}.html" target="_blank"><xsl:apply-templates/></a>
+               </xsl:when>
+               <xsl:when test="@type='inscription' and not(@n) and not(@target) and not(@corresp)">
+                  <a target="_blank" href="{lower-case(translate(string(.), ' ', ''))}.html"><xsl:apply-templates/></a>
+               </xsl:when>
+            </xsl:choose>
          </xsl:otherwise>
       </xsl:choose>
-  </xsl:template>
+   </xsl:template>
   
 
   <xsl:template name="link-text">

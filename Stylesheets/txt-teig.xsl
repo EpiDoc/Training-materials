@@ -8,13 +8,17 @@
   <xsl:import href="teig.xsl"/>
 
   <xsl:template match="t:g">
-      <xsl:param name="parm-leiden-style" tunnel="yes" required="no"></xsl:param>
-      <xsl:call-template name="lb-dash"/>
-      <xsl:call-template name="w-space"/>
+    <xsl:param name="parm-leiden-style" tunnel="yes" required="no"></xsl:param>
+    <xsl:call-template name="lb-dash">
+      <!-- params needed for excluding diplomatic and medCY project -->
+      <xsl:with-param name="parm-edition-type"/>
+      <xsl:with-param name="parm-leiden-style"/>
+    </xsl:call-template>
+    <xsl:call-template name="w-space"/>
 
       <xsl:choose>
         <xsl:when test="$parm-leiden-style=('edh-names','edh-itx')"/>
-          <xsl:when test="($parm-leiden-style = 'ddbdp' or $parm-leiden-style = 'sammelbuch')">
+          <xsl:when test="$parm-leiden-style = ('ddbdp','dclp','sammelbuch')">
             <xsl:call-template name="g-ddbdp"/>
          </xsl:when>
           <xsl:when test="$parm-leiden-style = 'dohnicht'">

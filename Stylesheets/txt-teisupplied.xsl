@@ -13,8 +13,12 @@
     <xsl:call-template name="unicode-underline"/>
   </xsl:template>
   
+  <xsl:template name="supplied-similar"><!-- added by SigiDoc -->
+    <xsl:call-template name="unicode-underline"/>
+  </xsl:template>
+  
   <xsl:template name="unicode-underline">
-    <xsl:analyze-string select="." regex="([A-Za-z])">
+    <xsl:analyze-string select="." regex="(\p{{L}}|\s)">
       <xsl:matching-substring>
         <xsl:for-each select="regex-group(1)">
           <xsl:value-of select="concat(.,'&#818;')"/>

@@ -1,31 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id$ -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:t="http://www.tei-c.org/ns/1.0"
-   xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:EDF="http://epidoc.sourceforge.net/ns/functions"
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+   xmlns:t="http://www.tei-c.org/ns/1.0"
+   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+   xmlns:EDF="http://epidoc.sourceforge.net/ns/functions"
    exclude-result-prefixes="t" version="2.0">
    <!-- Templates imported by [htm|txt]teigap.xsl -->
-
-   <!-- style of the dot defined here -->
-   <xsl:function name="EDF:dotchar" as="xs:string">
-      <xsl:param name="leidenStyle"></xsl:param>
-      <xsl:param name="gapReason"></xsl:param>
-      <xsl:variable name="dot">
-         <xsl:choose>
-            <xsl:when test="$leidenStyle = ('ddbdp','sammelbuch')">
-               <xsl:text>&#xa0;&#xa0;&#x323;</xsl:text>
-            </xsl:when>
-            <xsl:when test="$leidenStyle = 'panciera' and $gapReason='illegible'">
-               <xsl:text>+</xsl:text>
-            </xsl:when>
-            <xsl:when test="$leidenStyle='london'">
-               <xsl:text>&#xb7;</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-               <xsl:text>.</xsl:text>
-            </xsl:otherwise>
-         </xsl:choose>
-      </xsl:variable>
-      <xsl:sequence select="$dot"/>
+    
+    <!-- style of the dot defined here -->
+    <xsl:function name="EDF:dotchar" as="xs:string">
+       <xsl:param name="leidenStyle"></xsl:param>
+       <xsl:param name="gapReason"></xsl:param>
+       <xsl:variable name="dot">
+           <xsl:choose>
+              <xsl:when test="$leidenStyle = ('ddbdp','dclp','sammelbuch')">
+                   <xsl:text>&#xa0;&#xa0;&#x323;</xsl:text>
+               </xsl:when>
+               <xsl:when test="$leidenStyle = 'panciera' and $gapReason='illegible'">
+                   <xsl:text>+</xsl:text>
+               </xsl:when>
+               <xsl:when test="$leidenStyle='london'">
+                   <xsl:text>&#xb7;</xsl:text>
+               </xsl:when>
+              <xsl:when test="$leidenStyle='medcyprus'">
+                 <xsl:text>.</xsl:text>
+              </xsl:when>
+               <xsl:otherwise>
+                   <xsl:text>.</xsl:text>
+               </xsl:otherwise>
+           </xsl:choose>
+       </xsl:variable>
+       <xsl:sequence select="$dot"/>
    </xsl:function>
 
    <!-- The highest value of @quantity that will have dots produced -->
@@ -35,6 +40,9 @@
          <xsl:choose>
             <xsl:when test="$leidenStyle = ('ddbdp','sammelbuch')">
                <xsl:number value="8"/>
+            </xsl:when>
+            <xsl:when test="$leidenStyle = 'sigidoc'"><!-- +++++++++++++++++++++++++++++++++++++++ -->
+               <xsl:number value="25"/>
             </xsl:when>
             <xsl:otherwise>
                <xsl:number value="3"/>
@@ -49,7 +57,7 @@
       <xsl:param name="parm-leiden-style" tunnel="yes" required="no"></xsl:param>
       <xsl:choose>
          <xsl:when test="$parm-edition-type = 'diplomatic'"/>
-         <xsl:when test="$parm-leiden-style = 'panciera'">
+         <xsl:when test="$parm-leiden-style = 'panciera'"><!-- TO BE DONE!!!!!!!!!!!!!!!!!!!!!!!!!! -->
             <xsl:text>&#12296;---&#12297;</xsl:text>
          </xsl:when>
          <xsl:otherwise>
@@ -61,9 +69,9 @@
    </xsl:template>
 
    <xsl:template match="t:gap[@reason='ellipsis']">
-      <xsl:param name="parm-leiden-style" tunnel="yes" required="no"></xsl:param>
-      <xsl:choose>
-         <xsl:when test="$parm-leiden-style = ('ddbdp','sammelbuch')">
+       <xsl:param name="parm-leiden-style" tunnel="yes" required="no"></xsl:param>
+       <xsl:choose>
+          <xsl:when test="$parm-leiden-style = ('ddbdp','dclp','sammelbuch')">
             <xsl:if test="string(t:desc) != 'non transcribed'">
                <xsl:value-of select="t:desc"/>
                <xsl:text> </xsl:text>
@@ -109,26 +117,33 @@
 
 
    <xsl:template match="t:gap[@reason='illegible']">
+      <xsl:param name="location" tunnel="yes" required="no"/>
       <!-- certainty -->
       <xsl:if test="child::t:certainty[@match='..']">
          <xsl:text>?</xsl:text>
       </xsl:if>
 
-      <xsl:if
-         test="not(preceding::node()[1][self::text()][normalize-space(.)=''][preceding-sibling::node()[1][self::t:gap[@reason='illegible']]])
-         and not(preceding::node()[1][self::t:gap[@reason='illegible']])">
+      <xsl:if test="not(preceding::node()[1][self::text()][normalize-space(.)=''][preceding-sibling::node()[1][self::t:gap[@reason='illegible']]])
+         and not(preceding::node()[1][self::t:gap[@reason='illegible']]) and not($location = 'apparatus')">
+         <xsl:call-template name="extent-string"/>
+      </xsl:if>
+      
+      <!-- Apparatus display suppress  @extent='unknown' in apparatus TODO: possibly need to add: and not(self::t:gap[@reason='illegible'][@extent='unknown'])
+       -->
+      <xsl:if test="$location = 'apparatus'  and not(preceding::node()[1][self::text()][normalize-space(.)=''][preceding-sibling::node()[1][self::t:gap[@reason='illegible']]]) and not(preceding-sibling::node()[1][self::t:gap[@reason='illegible']])">
          <xsl:call-template name="extent-string"/>
       </xsl:if>
    </xsl:template>
 
 
    <xsl:template match="t:gap[@reason='lost']">
-      <xsl:param name="parm-leiden-style" tunnel="yes" required="no"></xsl:param>
-      <xsl:param name="parm-edition-type" tunnel="yes" required="no"></xsl:param>
-      <xsl:param name="parm-verse-lines" tunnel="yes" required="no"></xsl:param>
-      <xsl:choose>
-         <xsl:when test="$parm-leiden-style = ('ddbdp','sammelbuch') and @unit = 'line' and @extent = 'unknown'"/>
-         <xsl:when test="$parm-leiden-style = 'panciera' and @unit = 'line' and @extent = 'unknown'"/>
+       <xsl:param name="parm-leiden-style" tunnel="yes" required="no"></xsl:param>
+       <xsl:param name="parm-edition-type" tunnel="yes" required="no"></xsl:param>
+       <xsl:param name="parm-verse-lines" tunnel="yes" required="no"></xsl:param>
+       <xsl:choose>
+         <xsl:when
+            test="$parm-leiden-style = ('ddbdp','dclp','sammelbuch') and @unit = 'line' and @extent = 'unknown'"/>
+           <xsl:when test="$parm-leiden-style = ('panciera', 'sigidoc') and @unit = 'line' and @extent = 'unknown'"/>
          <xsl:when test="@unit='line'">
             <xsl:text>[</xsl:text>
          </xsl:when>
@@ -143,7 +158,7 @@
          </xsl:otherwise>
       </xsl:choose>
       <xsl:if
-         test="$parm-leiden-style='london' and preceding-sibling::node()[1][@part='M' or @part='I'] and not($parm-edition-type='diplomatic')">
+         test="$parm-leiden-style= ('london','medcyprus') and preceding-sibling::node()[1][@part='M' or @part='I'] and not($parm-edition-type='diplomatic')">
          <xsl:text>-</xsl:text>
       </xsl:if>
 
@@ -152,10 +167,15 @@
             <xsl:call-template name="verse-string"/>
          </xsl:when>
          <xsl:otherwise>
-            <!-- Don't display again if there is a preceding adjecent gap of the same kind -->
+            <!-- Don't display again if there is a preceding adjecent gap with @reason='lost' and @extent='unknown' 
+            -->
             <xsl:if
-               test="not(preceding::node()[1][self::text()][normalize-space(.)=''][preceding-sibling::node()[1][self::t:gap[@reason='lost']]])
-               and not(preceding::node()[1][self::t:gap[@reason='lost']])">
+               test="
+               (
+               not(preceding::node()[1][self::text()][normalize-space(.)=''][preceding-sibling::node()[1][self::t:gap[@reason='lost'][@extent='unknown']]])
+               and not(preceding::node()[1][self::t:gap[@reason='lost'][@extent='unknown']])
+               ) 
+               or not(self::t:gap[@reason='lost'][@extent='unknown'])">
                <xsl:call-template name="extent-string"/>
             </xsl:if>
          </xsl:otherwise>
@@ -164,7 +184,7 @@
       <!-- certainty -->
       <xsl:if test="child::t:certainty[@match='..']">
          <xsl:choose>
-            <xsl:when test="$parm-leiden-style = ('ddbdp','sammelbuch')">
+            <xsl:when test="$parm-leiden-style = ('ddbdp','dclp','sammelbuch')">
                <xsl:text>(?)</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -174,13 +194,14 @@
       </xsl:if>
 
       <xsl:if
-         test="$parm-leiden-style='london' and following-sibling::node()[1][@part='M' or @part='F'] and not($parm-edition-type='diplomatic')">
+         test="$parm-leiden-style= ('london','medcyprus') and following-sibling::node()[1][@part='M' or @part='F'] and not($parm-edition-type='diplomatic')">
          <xsl:text>-</xsl:text>
       </xsl:if>
 
       <xsl:choose>
-         <xsl:when test="$parm-leiden-style = ('ddbdp','sammelbuch') and @unit = 'line' and @extent = 'unknown'"/>
-         <xsl:when test="$parm-leiden-style = 'panciera' and @unit = 'line' and @extent = 'unknown'"/>
+         <xsl:when
+            test="$parm-leiden-style = ('ddbdp','dclp','sammelbuch') and @unit = 'line' and @extent = 'unknown'"/>
+          <xsl:when test="$parm-leiden-style = ('panciera', 'sigidoc') and @unit = 'line' and @extent = 'unknown'"/>
          <xsl:when test="@unit='line'">
             <xsl:text>]</xsl:text>
          </xsl:when>
@@ -197,16 +218,26 @@
    </xsl:template>
 
 
-   <xsl:template name="extent-string">
-      <xsl:param name="parm-edition-type" tunnel="yes" required="no"></xsl:param>
-      <xsl:param name="parm-leiden-style" tunnel="yes" required="no"></xsl:param>
-      <xsl:variable name="cur-dot" select="EDF:dotchar($parm-leiden-style,@reason)"></xsl:variable>
-      <xsl:variable name="cur-max" select="EDF:dotmax($parm-leiden-style)"></xsl:variable>
+  <xsl:template name="extent-string">
+    <xsl:param name="parm-edition-type" tunnel="yes" required="no"/>
+    <xsl:param name="parm-leiden-style" tunnel="yes" required="no"/>
+    <xsl:param name="parm-edn-structure" tunnel="yes" required="no"/> 
+    <!-- Found in htm|txt-teigap.xsl This allows, e.g. setting a text direction on the content. -->
+    <xsl:call-template name="extent-string-wrapper"/>    
+  </xsl:template>
+
+   <xsl:template name="extent-string-content">
+      <xsl:param name="parm-edition-type" tunnel="yes" required="no"/>
+      <xsl:param name="parm-leiden-style" tunnel="yes" required="no"/>
+      <xsl:param name="parm-edn-structure" tunnel="yes" required="no"/>
+      <xsl:variable name="cur-dot" select="EDF:dotchar($parm-leiden-style,@reason)"/>
+      <xsl:variable name="cur-max" select="EDF:dotmax($parm-leiden-style)"/>
+     
       <!-- Precision of <gap> defined -->
       <xsl:variable name="circa">
          <xsl:choose>
             <xsl:when
-               test="$parm-leiden-style = ('ddbdp','sammelbuch') and
+               test="$parm-leiden-style = ('ddbdp','dclp','sammelbuch') and
                (@precision='low' or (@unit='character' and number(@quantity) &gt; $cur-max))">
                <xsl:text>ca.</xsl:text>
             </xsl:when>
@@ -219,7 +250,7 @@
       <xsl:choose>
          <xsl:when test="@extent='unknown'">
             <xsl:choose>
-               <xsl:when test="$parm-leiden-style = ('ddbdp','sammelbuch')">
+               <xsl:when test="$parm-leiden-style = ('ddbdp','dclp','sammelbuch')">
                   <xsl:choose>
                      <!-- lines lost -->
                      <xsl:when test="@reason='lost' and @unit='line'">
@@ -234,7 +265,20 @@
                      </xsl:when>
                      <!-- other reason illegible and lost/chars caught in the otherwise -->
                      <xsl:otherwise>
-                        <xsl:text> -ca.?- </xsl:text>
+                        <xsl:text>&#x2066;&#x0A;-ca.?-&#x0A;&#x2069;</xsl:text>
+                     </xsl:otherwise>
+                  </xsl:choose>
+               </xsl:when>
+               <xsl:when test="$parm-leiden-style='medcyprus'">
+                  <xsl:choose>
+                     <xsl:when test="@unit='line' and $parm-edition-type!='diplomatic'">
+                        <xsl:text>– ? lines –</xsl:text>
+                     </xsl:when>
+                     <xsl:when test="@unit='line' and $parm-edition-type='diplomatic'">
+                        <xsl:text>– ? –</xsl:text>
+                     </xsl:when>
+                     <xsl:otherwise>   
+                        <xsl:text>.. ? ..</xsl:text>
                      </xsl:otherwise>
                   </xsl:choose>
                </xsl:when>
@@ -273,6 +317,29 @@
                      </xsl:when>
                   </xsl:choose>
                </xsl:when>
+               <xsl:when test="$parm-edn-structure = 'creta'">
+                  <xsl:text>- - -</xsl:text>
+               </xsl:when>
+               <xsl:when test="$parm-leiden-style = 'sigidoc'"><!-- ++++++++++++++++++++++++++++++++++++++++++++ -->
+                  <xsl:choose>
+                     <!-- Lost lines: quantity unknown -->
+                     <xsl:when test="@reason='lost' and @unit='line'">
+                        <xsl:text>[- - -?- - -]</xsl:text>
+                     </xsl:when>
+                     <!-- Illegible lines: quantity unknown -->
+                     <xsl:when test="@reason='illegible' and @unit='line'">
+                        <xsl:text>- - -?- - -</xsl:text>
+                     </xsl:when>
+                     <!-- Lost characters: quantity unknown-->
+                     <xsl:when test="@reason='lost' and @unit='character'">
+                        <xsl:text>...?...</xsl:text>
+                     </xsl:when>
+                     <!-- Illegible characters: quantity unknown -->
+                     <xsl:when test="@reason='illegible' and @unit='character'">
+                        <xsl:text>...?...</xsl:text>
+                     </xsl:when>
+                  </xsl:choose>
+               </xsl:when>
                <xsl:otherwise>
                   <xsl:text>---</xsl:text>
                </xsl:otherwise>
@@ -281,6 +348,11 @@
 
          <xsl:when test="@quantity and @unit='character'">
             <xsl:choose>
+               <xsl:when test="$parm-edition-type='diplomatic' and $parm-leiden-style='medcyprus'">
+                  <xsl:variable name="dots"
+                     select="'............................................................................................................................................................'"/>
+                  <xsl:value-of select="substring($dots, 1, number(@quantity))"/>
+               </xsl:when>
                <xsl:when test="$parm-edition-type = 'diplomatic'">
                   <xsl:variable name="dots"
                      select="'····························································································································································'"/>
@@ -296,9 +368,24 @@
                      </xsl:otherwise>
                   </xsl:choose>
                </xsl:when>
+               <xsl:when test="number(@quantity) &gt; $cur-max or (number(@quantity) &gt; 0 and @precision='low')"><!-- ++++++++++++++++++++++++++++++++++++++++++++ -->
+                  <xsl:choose>
+                     <xsl:when test="$parm-leiden-style = 'sigidoc'">
+                        <xsl:text>c. </xsl:text>
+                        <xsl:value-of select="@quantity"/>
+                     </xsl:when>
+                     <xsl:otherwise>
+                        <xsl:value-of select="$cur-dot"/>
+                        <xsl:text> </xsl:text>
+                        <xsl:value-of select="$circa"/>
+                        <xsl:value-of select="@quantity"/>
+                        <xsl:value-of select="$cur-dot"/>
+                     </xsl:otherwise>
+                  </xsl:choose>
+               </xsl:when>
                <xsl:when test="number(@quantity) &gt; $cur-max or (number(@quantity) &gt; 1 and @precision='low')">
                   <xsl:choose>
-                     <xsl:when test="$parm-leiden-style = ('ddbdp','sammelbuch')">
+                     <xsl:when test="$parm-leiden-style = ('ddbdp','dclp','sammelbuch')">
                         <xsl:choose>
                            <xsl:when test="t:desc = 'vestiges' and @reason = 'illegible'">
                               <xsl:call-template name="tpl-vest">
@@ -316,6 +403,15 @@
                      <xsl:when test="$parm-leiden-style = 'panciera'">
                         <xsl:text>c. </xsl:text>
                         <xsl:value-of select="@quantity"/>
+                     </xsl:when>
+                     <xsl:when test="$parm-leiden-style='medcyprus'">
+                        <xsl:value-of select="$cur-dot"/>
+                        <xsl:value-of select="$cur-dot"/>
+                        <xsl:text> ca </xsl:text>
+                        <xsl:value-of select="@quantity"/>
+                        <xsl:text> </xsl:text>
+                        <xsl:value-of select="$cur-dot"/>
+                        <xsl:value-of select="$cur-dot"/>
                      </xsl:when>
                      <xsl:when test="$parm-leiden-style = 'london'">
                         <xsl:value-of select="$cur-dot"/>
@@ -338,8 +434,7 @@
 
                <xsl:when test="$cur-max &gt;= number(@quantity)">
                   <xsl:choose>
-                     <xsl:when
-                        test="t:desc='vestiges' and @reason='illegible' and ($parm-leiden-style='ddbdp' or $parm-leiden-style='sammelbuch')">
+                     <xsl:when test="t:desc='vestiges' and @reason='illegible' and ($parm-leiden-style=('ddbdp','dclp','sammelbuch'))">
                         <xsl:call-template name="tpl-vest">
                            <xsl:with-param name="circa" select="$circa"/>
                         </xsl:call-template>
@@ -355,13 +450,13 @@
                <xsl:otherwise>
                   <xsl:choose>
                      <xsl:when
-                        test="t:desc='vestiges' and @reason='illegible' and ($parm-leiden-style='ddbdp' or $parm-leiden-style='sammelbuch')">
+                        test="t:desc='vestiges' and @reason='illegible' and ($parm-leiden-style=('ddbdp','dclp','sammelbuch'))">
                         <xsl:call-template name="tpl-vest">
                            <xsl:with-param name="circa" select="$circa"/>
                         </xsl:call-template>
                      </xsl:when>
                      <xsl:otherwise>
-                        <xsl:text> - - - </xsl:text>
+                        <xsl:text>&#x2066; - - - &#x2069;</xsl:text>
                      </xsl:otherwise>
                   </xsl:choose>
                </xsl:otherwise>
@@ -371,7 +466,7 @@
          <xsl:when test="@atLeast and @atMost and not($parm-leiden-style=('edh-names','edh-itx'))">
             <!-- reason illegible and lost caught in the otherwise -->
             <xsl:choose>
-               <xsl:when test="$parm-leiden-style = ('ddbdp','sammelbuch')">
+               <xsl:when test="$parm-leiden-style = ('ddbdp','dclp','sammelbuch')">
                   <xsl:choose>
                      <xsl:when test="t:desc='vestiges' and @reason='illegible'">
                         <xsl:call-template name="tpl-vest">
@@ -399,7 +494,7 @@
                      </xsl:when>
                   </xsl:choose>
                </xsl:when>
-               <xsl:when test="$parm-leiden-style = ('panciera','eagletxt')">
+               <xsl:when test="$parm-leiden-style = ('panciera','eagletxt') and not($parm-leiden-style = 'sigidoc')"><!-- +++++++++++++++++++++++++++++ -->
                   <xsl:choose>
                      <xsl:when test="parent::t:name[@type='praenomen']">
                         <xsl:text>-</xsl:text>
@@ -412,11 +507,66 @@
                      </xsl:otherwise>
                   </xsl:choose>
                </xsl:when>
-               <xsl:when test="$parm-leiden-style = ('panciera','eagletxt')">
+               <xsl:when test="$parm-leiden-style = ('panciera','eagletxt') and not($parm-leiden-style = 'sigidoc')"><!-- ++++++++++++++++++++++++++++++++++ -->
                   <xsl:text>c. </xsl:text>
                   <xsl:value-of select="@atLeast"/>
                   <xsl:text> - </xsl:text>
                   <xsl:value-of select="@atMost"/>
+               </xsl:when>
+               <xsl:when test="$parm-leiden-style='medcyprus'">
+                  <xsl:choose>
+                     <xsl:when test="@unit='character'">
+                        <xsl:value-of select="$cur-dot"/>
+                        <xsl:value-of select="$cur-dot"/>
+                        <xsl:if test="$parm-edition-type!='diplomatic'">
+                           <xsl:text> ca </xsl:text>
+                           <xsl:value-of select="@atLeast"/>
+                           <xsl:text>-</xsl:text>
+                           <xsl:value-of select="@atMost"/>
+                           <xsl:text> </xsl:text>
+                        </xsl:if>
+                        <xsl:if test="$parm-edition-type='diplomatic'">
+                           <xsl:value-of select="$cur-dot"/>
+                           <xsl:value-of select="$cur-dot"/>
+                           <xsl:value-of select="$cur-dot"/>
+                           <xsl:value-of select="$cur-dot"/>
+                        </xsl:if>
+                        <xsl:value-of select="$cur-dot"/>
+                        <xsl:value-of select="$cur-dot"/>
+                     </xsl:when>
+                     <xsl:otherwise>
+                        <xsl:text>– </xsl:text>
+                        <xsl:if test="$parm-edition-type!='diplomatic'">
+                           <xsl:if test="@precision='low'">
+                              <xsl:text>ca </xsl:text>
+                           </xsl:if>
+                           <xsl:text> </xsl:text>
+                           <xsl:value-of select="@atLeast"/>
+                           <xsl:text>-</xsl:text>
+                           <xsl:value-of select="@atMost"/>
+                           <xsl:text> lines</xsl:text>
+                        </xsl:if>
+                        <xsl:text> –</xsl:text>
+                     </xsl:otherwise>
+                  </xsl:choose>
+               </xsl:when>
+               <!-- Lost/illegible characters/lines: approximate extent --><!-- ++++++++++++++++++++++++++++++++++++++++ -->
+               <xsl:when test="$parm-leiden-style = 'sigidoc'">
+                  <xsl:choose>
+                     <xsl:when test="@unit='character'">
+                        <xsl:text>c. </xsl:text>
+                        <xsl:value-of select="@atLeast"/>
+                        <xsl:text> - </xsl:text>
+                        <xsl:value-of select="@atMost"/>
+                     </xsl:when>
+                     <xsl:when test="@unit='line'">
+                        <xsl:text>- - -c. </xsl:text>
+                        <xsl:value-of select="@atLeast"/>
+                        <xsl:text> - </xsl:text>
+                        <xsl:value-of select="@atMost"/>
+                        <xsl:text>- - -</xsl:text>
+                     </xsl:when>
+                  </xsl:choose>
                </xsl:when>
                <xsl:when test="$parm-leiden-style = 'london'">
                   <xsl:value-of select="$cur-dot"/>
@@ -443,7 +593,7 @@
 
          <xsl:when test="@quantity and @unit='line'">
             <xsl:choose>
-               <xsl:when test="$parm-leiden-style = ('ddbdp','sammelbuch')">
+               <xsl:when test="$parm-leiden-style = ('ddbdp','dclp','sammelbuch')">
                   <xsl:choose>
                      <xsl:when test="desc = 'vestiges' and @reason = 'illegible'">
                         <xsl:call-template name="tpl-vest">
@@ -480,11 +630,38 @@
                      </xsl:otherwise>
                   </xsl:choose>
                </xsl:when>
+               <xsl:when test="$parm-leiden-style='medcyprus'">
+                  <xsl:text>– </xsl:text>
+                  <xsl:if test="$parm-edition-type!='diplomatic'">
+                     <xsl:if test="@precision='low'">
+                        <xsl:text>ca </xsl:text>
+                     </xsl:if>
+                     <xsl:value-of select="@quantity"/>
+                     <xsl:text> line</xsl:text>
+                     <xsl:if test="number(@quantity) &gt; 1"><xsl:text>s</xsl:text></xsl:if>
+                  </xsl:if>
+                  <xsl:text> –</xsl:text>
+               </xsl:when>
                <xsl:when test="$parm-leiden-style = 'london'">
                   <xsl:text>---</xsl:text>
                </xsl:when>
-               <xsl:when test="$parm-leiden-style =('panciera','eagletxt') and not(following-sibling::t:lb)">
+               <xsl:when test="$parm-leiden-style =('panciera','eagletxt') and not(following-sibling::t:lb) and not($parm-leiden-style = 'sigidoc')"><!-- +++++++++++++++++++++++++++++ -->
                   <xsl:text>------</xsl:text>
+               </xsl:when>
+               <!-- Lost/Illegible lines: approximate quantity --><!-- ++++++++++++++++++++++++++++++++++++++++++++++++ -->
+               <xsl:when test="$parm-leiden-style = 'sigidoc' and @precision='low'">
+                  <xsl:choose>
+                     <xsl:when test="@reason='lost'">
+                        <xsl:text>- - -c. </xsl:text>
+                        <xsl:value-of select="@quantity"/>
+                        <xsl:text>- - -</xsl:text>
+                     </xsl:when>
+                     <xsl:when test="@reason='illegible'">
+                        <xsl:text>- - - c. </xsl:text>
+                        <xsl:value-of select="@quantity"/>
+                        <xsl:text>- - -</xsl:text>
+                     </xsl:when>
+                  </xsl:choose>
                </xsl:when>
                <xsl:when test="$parm-leiden-style = 'edh-itx'">
                   <xsl:choose>
@@ -500,7 +677,7 @@
                   </xsl:choose>
                </xsl:when>
                <xsl:otherwise>
-                  <xsl:text> - - - - - - - - - - </xsl:text>
+                  <xsl:text>&#x2066; - - - - - - - - - - &#x2069;</xsl:text>
                </xsl:otherwise>
             </xsl:choose>
          </xsl:when>
@@ -508,7 +685,7 @@
          <xsl:when test="@quantity and @unit='cm'">
             <xsl:choose>
                <xsl:when
-                  test="desc = 'vestiges' and $parm-leiden-style = ('ddbdp','sammelbuch') and @reason = 'illegible'">
+                  test="desc = 'vestiges' and $parm-leiden-style = ('ddbdp','dclp','sammelbuch') and @reason = 'illegible'">
                   <xsl:call-template name="tpl-vest">
                      <xsl:with-param name="circa" select="$circa"/>
                   </xsl:call-template>
@@ -530,7 +707,7 @@
          <xsl:otherwise>
             <xsl:choose>
                <xsl:when
-                  test="desc = 'vestiges' and $parm-leiden-style = ('ddbdp','sammelbuch') and @reason = 'illegible'">
+                  test="desc = 'vestiges' and $parm-leiden-style = ('ddbdp','dclp','sammelbuch') and @reason = 'illegible'">
                   <xsl:call-template name="tpl-vest">
                      <xsl:with-param name="circa" select="$circa"/>
                   </xsl:call-template>

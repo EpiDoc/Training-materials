@@ -10,12 +10,18 @@
   <xsl:template match="t:g">
       <xsl:param name="parm-edition-type" tunnel="yes" required="no"></xsl:param>
       <xsl:param name="parm-leiden-style" tunnel="yes" required="no"></xsl:param>
-      <xsl:call-template name="lb-dash"/>
+      <xsl:param name="parm-edn-structure" tunnel="yes" required="no"></xsl:param>
+      <xsl:param name="location" tunnel="yes" required="no"></xsl:param>
+      <xsl:call-template name="lb-dash">
+        <!-- params needed for excluding diplomatic and medCY project -->
+        <xsl:with-param name="parm-edition-type" tunnel="yes"/>
+        <xsl:with-param name="parm-leiden-style" tunnel="yes"/>
+      </xsl:call-template>
       <xsl:call-template name="w-space"/>
     
      <xsl:choose>
-         <xsl:when test="starts-with($parm-leiden-style, 'edh') or $parm-leiden-style='eagletxt'"/>
-         <xsl:when test="($parm-leiden-style = 'ddbdp' or $parm-leiden-style = 'sammelbuch')">
+         <xsl:when test="starts-with($parm-leiden-style, 'edh')"/>
+       <xsl:when test="($parm-leiden-style = ('ddbdp','dclp','sammelbuch'))">
         <!-- Found in teig.xsl -->
         <xsl:call-template name="g-ddbdp"/>
          </xsl:when>
@@ -44,6 +50,9 @@
            <xsl:apply-imports/>
            <xsl:text>⊃</xsl:text>
         </xsl:when>
+        <xsl:when test="$parm-edn-structure='inslib' and (starts-with(ancestor::t:TEI//t:publicationStmt/t:idno[@type='filename']/text(), 'IGCyr') or starts-with(ancestor::t:TEI//t:publicationStmt/t:idno[@type='filename']/text(), 'GVCyr'))">
+         <xsl:apply-imports/>
+       </xsl:when>
         <xsl:otherwise>
            <xsl:text>((</xsl:text>
            <xsl:apply-imports/>

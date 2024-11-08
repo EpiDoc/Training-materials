@@ -8,7 +8,9 @@
 
    <xsl:template match="t:hi">
        <xsl:param name="parm-leiden-style" tunnel="yes" required="no"></xsl:param>
-       <xsl:choose>
+       <xsl:param name="parm-edn-structure" tunnel="yes" required="no"></xsl:param>
+       <xsl:param name="parm-edition-type" tunnel="yes" required="no"></xsl:param>
+      <xsl:choose>
          <!-- No html code needed for these -->
          <xsl:when
             test="@rend = 'diaeresis' or @rend = 'grave' or @rend = 'acute' or @rend = 'asper' or @rend = 'lenis' or @rend = 'circumflex'">
@@ -63,6 +65,9 @@
                   <xsl:when test="$parm-leiden-style=('petrae','iospe')">
                      <xsl:attribute name="class">petraeligature</xsl:attribute>
                   </xsl:when>
+                  <xsl:when test="$parm-edn-structure = 'inslib' or $parm-leiden-style=('london','usep') or ($parm-leiden-style = 'medcyprus' and $parm-edition-type='diplomatic')">
+                     <xsl:attribute name="class">curvedligature</xsl:attribute>
+                  </xsl:when>
                   <xsl:otherwise>
                      <xsl:attribute name="class">ligature</xsl:attribute>
                   </xsl:otherwise>
@@ -96,9 +101,18 @@
             <xsl:element name="span">
                <xsl:attribute name="class">reversed</xsl:attribute>
                <xsl:attribute name="title">reversed: <xsl:value-of select="."/>
-               </xsl:attribute> ((<xsl:apply-templates/>)) </xsl:element>
+               </xsl:attribute>((<xsl:apply-templates/>))</xsl:element>
          </xsl:when>
          <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+         <!-- @rend='inverted'                                                   -->
+          <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+          <xsl:when test="@rend='inverted'">
+             <xsl:element name="span">
+                <xsl:attribute name="class">inverted</xsl:attribute>
+                <xsl:attribute name="title">inverted: <xsl:value-of select="."/>
+                </xsl:attribute>((<xsl:apply-templates/>))</xsl:element>
+          </xsl:when>
+          <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
          <!-- @rend='small'                                                      -->
          <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
          <xsl:when test="@rend='small'">
@@ -125,7 +139,7 @@
                <xsl:when test="$parm-leiden-style = 'iospe'">
                   <xsl:apply-templates/>
                </xsl:when>
-                <xsl:when test="$parm-leiden-style = 'ddbdp' or $parm-leiden-style = 'sammelbuch'">
+                <xsl:when test="$parm-leiden-style = 'ddbdp' or $parm-leiden-style = 'sammelbuch' or $parm-leiden-style = 'sigidoc'"><!-- modified by SigiDoc -->
                   <span style="vertical-align:sub;">
                      <xsl:apply-imports/>
                   </span>
@@ -144,7 +158,7 @@
                <xsl:when test="$parm-leiden-style = 'iospe'">
                   <xsl:apply-templates/>
                </xsl:when>
-                <xsl:when test="$parm-leiden-style = 'ddbdp' or $parm-leiden-style = 'sammelbuch'">
+                <xsl:when test="$parm-leiden-style = ('ddbdp','dclp','sammelbuch')">
                   <span style="vertical-align:super;">
                      <xsl:apply-imports/>
                   </span>

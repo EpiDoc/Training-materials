@@ -6,16 +6,16 @@
                 exclude-result-prefixes="t EDF" 
                 version="2.0">
 
-  <xsl:template match="t:supplied[@reason='lost']">
+   <xsl:template match="t:supplied[@reason='lost']">
       <xsl:param name="parm-edition-type" tunnel="yes" required="no"></xsl:param>
       <xsl:param name="parm-leiden-style" tunnel="yes" required="no"></xsl:param>
       <xsl:param name="location" />
-      <xsl:if test="($parm-leiden-style = 'ddbdp' or $parm-leiden-style = 'sammelbuch') and child::t:*[1][local-name() = 'milestone'][@rend = 'paragraphos']">
+      <xsl:if test="($parm-leiden-style = ('ddbdp','dclp','sammelbuch')) and child::t:*[1][local-name() = 'milestone'][@rend = 'paragraphos']">
          <br/>
       </xsl:if>
       <xsl:choose>
          <xsl:when test="@evidence">
-            <xsl:if test="$parm-leiden-style = 'ddbdp' or $parm-leiden-style = 'sammelbuch'">
+            <xsl:if test="$parm-leiden-style = ('ddbdp','dclp','sammelbuch')">
                <xsl:text>[</xsl:text>
             </xsl:if>
             <xsl:choose>
@@ -27,12 +27,15 @@
                   <!-- Found in [htm|txt]-teisupplied.xsl -->
                   <xsl:call-template name="supplied-previouseditor"/>
                </xsl:when>
+               <xsl:when test="@evidence = 'similar'"><!-- added by SigiDoc -->
+                  <!-- Found in [htm|txt]-teisupplied.xsl -->
+                  <xsl:call-template name="supplied-similar"/>
+               </xsl:when>
             </xsl:choose>
             <xsl:if test="$parm-leiden-style = 'ddbdp' or $parm-leiden-style = 'sammelbuch'">
                <xsl:text>]</xsl:text>
             </xsl:if>
-         </xsl:when>
-         
+         </xsl:when>         
          <xsl:otherwise>
         <!--
            *NB* the lost-opener and lost-closer templates, found in tpl-reasonlost.xsl,
@@ -83,11 +86,13 @@
             </xsl:choose>
             <!-- Found in tpl-cert-low.xsl -->
             <xsl:call-template name="cert-low"/>
-            <!-- function EDF:f-wwrap declared in htm-teilb.xsl; tests if lb break=no immediately follows supplied -->
-            <xsl:if test="EDF:f-wwrap(.) = true()">
+            <!-- function EDF:f-wwrap declared in functions.xsl; tests if lb break=no immediately follows supplied -->
+            <!-- UNLESS diplomatic -->
+            <!-- or UNLESS project MedCyprus -->
+            <xsl:if test="EDF:f-wwrap(.) = true() and not($parm-edition-type='diplomatic') and not($parm-leiden-style='medcyprus')">
                <!-- unless this is in the app part of a choice/subst/app in ddbdp
                       or an EDH leiden style, which doesn't use hyphens-->
-                <xsl:if test="(not($parm-leiden-style='ddbdp' and (ancestor::t:*[local-name()=('reg','corr','rdg') 
+                <xsl:if test="(not($parm-leiden-style=('ddbdp','dclp') and (ancestor::t:*[local-name()=('reg','corr','rdg')
                    or self::t:del[parent::t:subst]]))) and (not($location = 'apparatus'))
                    and not(starts-with($parm-leiden-style, 'edh') or $parm-leiden-style='eagletxt')">
                   <xsl:text>-</xsl:text>
@@ -103,27 +108,25 @@
             <xsl:text>]</xsl:text>
          </xsl:otherwise>
       </xsl:choose>
-  </xsl:template>
-  
+   </xsl:template>
 
   <xsl:template match="t:supplied[@reason='omitted']">
       <xsl:param name="parm-edition-type" tunnel="yes" required="no"></xsl:param>
       <xsl:choose>
-          <xsl:when test="$parm-edition-type='diplomatic'"/>
+         <xsl:when test="$parm-edition-type='diplomatic'"/>
          <xsl:when test="@evidence = 'parallel'">
-        <!-- Found in [htm|txt]-teisupplied.xsl -->
-        <xsl:call-template name="supplied-parallel"/>
+            <!-- Found in [htm|txt]-teisupplied.xsl -->
+            <xsl:call-template name="supplied-parallel"/>
          </xsl:when>
          <xsl:otherwise>
             <xsl:text>&lt;</xsl:text>
             <xsl:apply-templates/>
             <!-- Found in tpl-cert-low.xsl -->
-        <xsl:call-template name="cert-low"/>
+            <xsl:call-template name="cert-low"/>
             <xsl:text>&gt;</xsl:text>
          </xsl:otherwise>
       </xsl:choose>
-  </xsl:template>
-  
+   </xsl:template>
 
   <xsl:template match="t:supplied[@reason='subaudible']">
      <xsl:param name="parm-leiden-style" tunnel="yes" required="no"></xsl:param>
@@ -134,19 +137,23 @@
             <xsl:call-template name="supplied-subaudible"/>
         </xsl:otherwise> </xsl:choose>
   </xsl:template>
-  
 
-  <xsl:template match="t:supplied[@reason='explanation']">
+   <xsl:template match="t:supplied[@reason='explanation']">
       <xsl:text>(i.e. </xsl:text>
       <xsl:apply-templates/>
       <xsl:call-template name="cert-low"/>
       <xsl:text>)</xsl:text>
-  </xsl:template>
+   </xsl:template>
 
-
-<xsl:template match="t:supplied[@reason='undefined' and @evidence]">
+   <xsl:template match="t:supplied[@reason='undefined' and @evidence]">
       <xsl:param name="parm-leiden-style" tunnel="yes" required="no"></xsl:param>
       <xsl:choose>
+         <xsl:when test="@evidence = 'apograph'">
+            <xsl:text>⌈</xsl:text>
+            <xsl:apply-templates/>
+            <xsl:call-template name="cert-low"/>
+            <xsl:text>⌉</xsl:text>
+         </xsl:when>
          <xsl:when test="@evidence = 'parallel'">
             <!-- Found in [htm|txt]-teisupplied.xsl -->
             <xsl:call-template name="supplied-parallel"/>
@@ -154,6 +161,10 @@
          <xsl:when test="@evidence = 'previouseditor'">
             <!-- Found in [htm|txt]-teisupplied.xsl -->
             <xsl:call-template name="supplied-previouseditor"/>
+         </xsl:when>
+         <xsl:when test="@evidence = 'similar'"><!-- added by SigiDoc -->
+            <!-- Found in [htm|txt]-teisupplied.xsl -->
+            <xsl:call-template name="supplied-similar"/>
          </xsl:when>
       </xsl:choose>
    </xsl:template>
